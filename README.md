@@ -1,2 +1,0 @@
-# Stellar-Burgers
-# new Burgers
