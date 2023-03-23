@@ -1,0 +1,41 @@
+.section {
+  max-width: 600px;
+}
+
+.sectionList {
+  max-height: 47vh;
+  overflow: auto;
+  list-style: none;
+  padding-inline-start: 0;
+  gap: 20px;
+}
+
+.sectionList::-webkit-scrollbar {
+  width: 8px;
+  background-color: #2f2f37;
+}
+
+.sectionList::-webkit-scrollbar-thumb {
+  background-color: #8585AD;
+}
+
+.cardIngredient {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cardIngredient__icon {
+  width: 24px;
+  height: 24px;
+}
+
+.purchaseAmount__wrapper {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.cardBuns {
+  composes: purchaseAmount__wrapper;
+}

@@ -24,10 +24,6 @@
   text-align: center;
 }
 
-.cardIngredient__counter {
-  display: none;
-}
-
 .navMenuIngredients__wrapper {
   display: flex;
 }
@@ -46,7 +42,7 @@
 }
 
 .tabBurgerIngredients__section {
-  max-height: 69vh;
+  max-height: 68vh;
   overflow-y: auto;
 }
 

@@ -1,7 +1,7 @@
 import { Logo, BurgerIcon, ListIcon, ProfileIcon } from '@ya.praktikum/react-developer-burger-ui-components';
 import style from '../app-header/app-header.module.css'
 
-
+// Компонент собирающий в себе весь блок header
 function AppHeader() {
   return (
     <header className={style.header}>
@@ -22,7 +22,9 @@ function AppHeader() {
             </li>
           </ul>
         </nav>
-        <div className={style.header__logo}><a href="foo"><Logo /></a></div> 
+        <div className={style.header__logo}>
+          <a href="foo"><Logo /></a>
+        </div> 
         <div className={style.header__profile}>
           <a href="#" className={`${style.header__link} p-5`}>
             <ProfileIcon type='secondary' />
