@@ -1,2 +1,1 @@
-# Stellar-Burgers
-# new Burgers
+Приложения в разработке ....
