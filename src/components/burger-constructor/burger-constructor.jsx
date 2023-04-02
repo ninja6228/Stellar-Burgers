@@ -1,6 +1,9 @@
 import PropTypes from 'prop-types';
+import { useState } from 'react';
 import { CurrencyIcon, DragIcon, Button, ConstructorElement } from '@ya.praktikum/react-developer-burger-ui-components';
 import style from '../burger-constructor/burger-constructor.module.css'
+import OrderDetails from '../order-details/order-details.jsx'
+import { ingredientType } from '../../utils/types.js'
 
 // массив ингредиентов без булочек
 function listIngredients({ data }) {
@@ -9,6 +12,7 @@ function listIngredients({ data }) {
   })
   return ingredients
 };
+
 // массив только с булочками
 function listBuns({ data }) {
   const buns = data.filter(item => {
@@ -16,27 +20,27 @@ function listBuns({ data }) {
   })
   return buns
 };
+
 // Компонент с карточкой ингредиента 
 function СardIngredient({ ingredient }) {
+  const { name, price, image } = ingredient
   return (
     <li className={`${style.cardIngredient} mb-4`}>
       <div className={`${style.cardIngredient__icon} ml-2`}><DragIcon type='primary' /></div>
       <ConstructorElement
         isLocked={false}
-        text={ingredient.name}
-        price={ingredient.price}
-        thumbnail={ingredient.image}
+        text={name}
+        price={price}
+        thumbnail={image}
       />
     </li>
   )
 };
+
 СardIngredient.propTypes = {
-  ingredient: PropTypes.shape({
-    name: PropTypes.string,
-    price: PropTypes.number,
-    image: PropTypes.string
-  })
+  ingredient: PropTypes.shape(ingredientType)
 }
+
 // Компонент с карточкой булочки, в зависимости от переданной позиции меняется описание 
 function CardBuns({ position, buns }) {
   const positionBun = position === 'top' ? `(верх)` : `(низ)`;
@@ -52,33 +56,42 @@ function CardBuns({ position, buns }) {
     </div>
   )
 };
+
 CardBuns.propTypes = {
   position: PropTypes.string.isRequired,
-  buns: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    price: PropTypes.number.isRequired,
-    image: PropTypes.string.isRequired
-  })
+  buns: PropTypes.shape(ingredientType)
 };
+
 // Компонент с финальной суммой всех инградиентов и кнопкой для потверждения заказа
 function PurchaseAmount({ ingredients, buns }) {
+
+  const [active, setActive] = useState(false)
+
+  function openPopup() {
+    return !active ? setActive(true) : null
+  }
+
   const arrayForPrices = []
   ingredients.map(item => arrayForPrices.push(item.price))
   const totalValueIngredients = arrayForPrices.reduce((sum, price) => sum + price, 0)
+
   return (
     <section className={`${style.purchaseAmount__wrapper} mt-10 mr-5`}>
       <span className='text text_type_digits-medium mr-10'>
         {totalValueIngredients + (buns[0].price * 2)}
         <CurrencyIcon />
       </span>
-      <Button htmlType="button" type="primary" size="large">Оформить заказ</Button>
+      <Button htmlType="button" type="primary" size="large" onClick={openPopup}>Оформить заказ</Button>
+      <OrderDetails active={active} setActive={setActive} />
     </section>
   )
 };
+
 PurchaseAmount.propTypes = {
   ingredients: PropTypes.array.isRequired,
   buns: PropTypes.array.isRequired,
 }
+
 // Компонент принемающий в себя выбранные инградиенты и собирающий в себя все остальный компоненты для этого блока 
 function BurgerConstructor({ data }) {
   const buns = listBuns({ data })
@@ -96,6 +109,7 @@ function BurgerConstructor({ data }) {
     </section>
   )
 };
+
 BurgerConstructor.propTypes = {
   data: PropTypes.arrayOf(PropTypes.object).isRequired
 }
