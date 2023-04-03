@@ -1,9 +1,10 @@
 import PropTypes from 'prop-types';
 import { useState } from 'react';
 import { CurrencyIcon, DragIcon, Button, ConstructorElement } from '@ya.praktikum/react-developer-burger-ui-components';
+import { ingredientType } from '../../utils/types.js'
 import style from '../burger-constructor/burger-constructor.module.css'
 import OrderDetails from '../order-details/order-details.jsx'
-import { ingredientType } from '../../utils/types.js'
+import Modal from "../modal/modal";
 
 // массив ингредиентов без булочек
 function listIngredients({ data }) {
@@ -67,8 +68,12 @@ function PurchaseAmount({ ingredients, buns }) {
 
   const [active, setActive] = useState(false)
 
-  function openPopup() {
-    return !active ? setActive(true) : null
+  function handleOpen() {
+    setActive(true)
+  }
+
+  function handleClose() {
+    setActive(false)
   }
 
   const arrayForPrices = []
@@ -81,8 +86,13 @@ function PurchaseAmount({ ingredients, buns }) {
         {totalValueIngredients + (buns[0].price * 2)}
         <CurrencyIcon />
       </span>
-      <Button htmlType="button" type="primary" size="large" onClick={openPopup}>Оформить заказ</Button>
-      <OrderDetails active={active} setActive={setActive} />
+      <Button htmlType="button" type="primary" size="large" onClick={handleOpen}>Оформить заказ</Button>
+      {
+        active && (
+          <Modal onClose={handleClose}>
+            <OrderDetails />
+          </Modal>
+        )}
     </section>
   )
 };

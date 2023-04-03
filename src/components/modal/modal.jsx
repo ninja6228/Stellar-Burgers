@@ -5,37 +5,35 @@ import { CloseIcon } from '@ya.praktikum/react-developer-burger-ui-components';
 import style from './modal.module.css';
 import ModalOverlay from '../modal-overlay/modal-overlay.jsx'
 
+const modals = document.getElementById('modals');
 
-function Modal({ children, active, setActive }) {
-  const modals = document.getElementById('modals');
-  const modal = active && (
+function Modal({ children, onClose }) {
+
+  const modal = (
     <ModalOverlay clickModalOverlay={closeClickOverlay}>
       <div className={style.wrapper}>
         <div className={`${style.positionIcon} mt-15 mr-10`}>
-          <CloseIcon type='primary' onClick={closeModal} />
+          <CloseIcon type='primary' onClick={onClose} />
         </div>
         {children}
       </div>
-    </ModalOverlay>
-  )
+    </ModalOverlay>)
+
 
   useEffect(() => {
-    document.addEventListener("keydown", closePressingEsc)
-    return () => {
-      document.removeEventListener("keydown", closePressingEsc)
+    function closePressingEsc(evt) {
+      if (evt.key === 'Escape') {
+        onClose()
+      }
     }
-  })
-
-  function closeModal() {
-    return active ? setActive(false) : null
-  }
-
-  function closePressingEsc(evt) {
-    return evt.key === 'Escape' ? closeModal() : null
-  }
+    document.addEventListener("keydown", closePressingEsc)
+    return () => { document.removeEventListener("keydown", closePressingEsc) }
+  }, [])
 
   function closeClickOverlay(evt) {
-    return evt.target === evt.currentTarget ? closeModal() : null
+    if (evt.target === evt.currentTarget) {
+      onClose()
+    }
   }
 
   return createPortal(modal, modals)
@@ -43,8 +41,7 @@ function Modal({ children, active, setActive }) {
 
 Modal.propTypes = {
   children: PropTypes.node.isRequired,
-  active: PropTypes.bool.isRequired,
-  setActive: PropTypes.func.isRequired
+  onClose: PropTypes.func.isRequired
 }
 
 export default Modal

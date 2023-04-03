@@ -15,7 +15,7 @@ function App() {
           const data = await res.json();
           setIngredients(data)
         } else {
-          console.log(`Ошибка: ${res.status}`);
+          return Promise.reject(`Ошибка ${res.status}`);
         }
       }
       catch(error) {
