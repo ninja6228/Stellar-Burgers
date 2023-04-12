@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useState, useContext  } from 'react';
 import PropTypes from 'prop-types';
 import { Counter, CurrencyIcon, Tab } from '@ya.praktikum/react-developer-burger-ui-components';
-import { ingredientType } from '../../utils/types.js'
+import { ingredientType } from '../../utils/types.js';
 import Modal from "../modal/modal";
-import style from '../burger-Ingredients/burger-Ingredients.module.css'
-import IngredientDetails from '../ingredient-details/ingredient-details.jsx'
+import style from '../burger-Ingredients/burger-Ingredients.module.css';
+import IngredientDetails from '../ingredient-details/ingredient-details.jsx';
+
+import { IngredientsContext } from '../../services/context.js';
 
 // Компонент с блоком навигации по типу ингредиентов
 function NavMenuIngredients() {
@@ -71,18 +73,19 @@ SectionIngredients.propTypes = {
 };
 
 // Компонент собирающий собирающий в себя все остальный компоненты для этого блока 
-function TabBurgerIngredients({ data }) {
-
+function TabBurgerIngredients() {
+  
+  const initialIngredients = useContext(IngredientsContext);
   const [active, setActive] = useState(false)
   const [descriptionIngredient, setDescriptionIngredient] = useState(null);
-
+  
   function handleClose() {
     setActive(false)
   }
 
   function handleOpen(evt) {
     const clickСardId = evt.currentTarget.getAttribute('id');
-    setDescriptionIngredient(data.find((card) => card._id === clickСardId));
+    setDescriptionIngredient(initialIngredients.data.find((card) => card._id === clickСardId));
     setActive(true)
   }
 
@@ -99,7 +102,7 @@ function TabBurgerIngredients({ data }) {
         <div className={style.tabBurgerIngredients__section}>
           {
             typeIngredients.map((item, index) => {
-              return <SectionIngredients data={data} ingredient={item.type} key={index} handleOpen={handleOpen} />
+              return <SectionIngredients data={initialIngredients.data} ingredient={item.type} key={index} handleOpen={handleOpen} />
             })
           }
         </div>
@@ -113,10 +116,6 @@ function TabBurgerIngredients({ data }) {
       }
     </>
   )
-};
-
-TabBurgerIngredients.propTypes = {
-  data: PropTypes.arrayOf(PropTypes.object).isRequired
 };
 
 export default TabBurgerIngredients
