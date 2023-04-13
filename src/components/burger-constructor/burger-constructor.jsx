@@ -5,7 +5,7 @@ import { ingredientType } from '../../utils/types.js'
 import style from '../burger-constructor/burger-constructor.module.css'
 import OrderDetails from '../order-details/order-details.jsx'
 import Modal from "../modal/modal";
-import { baseUrl } from '../../utils/config.js';
+import { checkResponse, baseUrl } from '../../utils/apiConfig.js';
 
 import { IngredientsContext } from '../../services/context.js';
 
@@ -91,13 +91,9 @@ function PurchaseAmount({ ingredients, buns, idIngredients }) {
           ingredients: idIngredients,
         }),
       });
-      if (res.ok) {
-        const data = await res.json();
-        setOrderData(data)
-        setActive(true);
-      } else {
-        return Promise.reject(`Ошибка ${res.status}`);
-      }
+      const data = await checkResponse(res)
+      setOrderData(data)
+      setActive(true);
     }
     catch (error) {
       console.log(`Произошла ошибка: ${error}`);
