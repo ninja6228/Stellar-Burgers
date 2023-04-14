@@ -1,10 +1,13 @@
 import PropTypes from 'prop-types';
-import { useState } from 'react';
+import { useState, useMemo, useContext } from 'react';
 import { CurrencyIcon, DragIcon, Button, ConstructorElement } from '@ya.praktikum/react-developer-burger-ui-components';
 import { ingredientType } from '../../utils/types.js'
 import style from '../burger-constructor/burger-constructor.module.css'
 import OrderDetails from '../order-details/order-details.jsx'
 import Modal from "../modal/modal";
+import { checkResponse, baseUrl } from '../../utils/apiConfig.js';
+
+import { IngredientsContext } from '../../services/context.js';
 
 // массив ингредиентов без булочек
 function listIngredients({ data }) {
@@ -64,33 +67,49 @@ CardBuns.propTypes = {
 };
 
 // Компонент с финальной суммой всех инградиентов и кнопкой для потверждения заказа
-function PurchaseAmount({ ingredients, buns }) {
-
+function PurchaseAmount({ ingredients, buns, idIngredients }) {
   const [active, setActive] = useState(false)
-
-  function handleOpen() {
-    setActive(true)
-  }
+  const [orderData, setOrderData] = useState()
+  const arrayForPrices = [];
+  ingredients.map(item => arrayForPrices.push(item.price))
+  const totalValueIngredients = useMemo(() => arrayForPrices.reduce(
+    (sum, price) => sum + price, 0) + (buns * 2), [arrayForPrices, buns]
+  )
 
   function handleClose() {
     setActive(false)
   }
 
-  const arrayForPrices = []
-  ingredients.map(item => arrayForPrices.push(item.price))
-  const totalValueIngredients = arrayForPrices.reduce((sum, price) => sum + price, 0)
-
+  async function sendAnOrder() {
+    try {
+      const res = await fetch(`${baseUrl}orders`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': "application/json"
+        },
+        body: JSON.stringify({
+          ingredients: idIngredients,
+        }),
+      });
+      const data = await checkResponse(res)
+      setOrderData(data)
+      setActive(true);
+    }
+    catch (error) {
+      console.log(`Произошла ошибка: ${error}`);
+    }
+  }
   return (
     <section className={`${style.purchaseAmount__wrapper} mt-10 mr-5`}>
       <span className='text text_type_digits-medium mr-10'>
-        {totalValueIngredients + (buns[0].price * 2)}
+        {totalValueIngredients}
         <CurrencyIcon />
       </span>
-      <Button htmlType="button" type="primary" size="large" onClick={handleOpen}>Оформить заказ</Button>
+      <Button htmlType="button" type="primary" size="large" onClick={sendAnOrder}>Оформить заказ</Button>
       {
         active && (
           <Modal onClose={handleClose}>
-            <OrderDetails />
+            <OrderDetails orderDetails={orderData} />
           </Modal>
         )}
     </section>
@@ -98,14 +117,17 @@ function PurchaseAmount({ ingredients, buns }) {
 };
 
 PurchaseAmount.propTypes = {
+  idIngredients: PropTypes.array.isRequired,
   ingredients: PropTypes.array.isRequired,
-  buns: PropTypes.array.isRequired,
+  buns: PropTypes.number.isRequired
 }
 
 // Компонент принемающий в себя выбранные инградиенты и собирающий в себя все остальный компоненты для этого блока 
-function BurgerConstructor({ data }) {
-  const buns = listBuns({ data })
-  const ingredients = listIngredients({ data })
+function BurgerConstructor() {
+  const initialIngredients = useContext(IngredientsContext);
+  const buns = listBuns(initialIngredients)
+  const ingredients = listIngredients(initialIngredients)
+  const idIngredients = initialIngredients.data.map(item => item._id)
   return (
     <section className={`${style.section} mt-25 pr-4 pl-2`}>
       <CardBuns position={'top'} buns={buns[0]} />
@@ -115,13 +137,10 @@ function BurgerConstructor({ data }) {
         })}
       </ul>
       <CardBuns position={'bottom'} buns={buns[0]} />
-      <PurchaseAmount ingredients={ingredients} buns={buns} />
+      <PurchaseAmount ingredients={ingredients} buns={buns[0].price} idIngredients={idIngredients} />
     </section>
   )
 };
 
-BurgerConstructor.propTypes = {
-  data: PropTypes.arrayOf(PropTypes.object).isRequired
-}
 
 export default BurgerConstructor

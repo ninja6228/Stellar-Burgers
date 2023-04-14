@@ -1,24 +1,21 @@
 import { useState, useEffect } from 'react';
-import style from '../app/app.module.css'
+import style from '../app/app.module.css';
 import AppHeader from '../app-header/app-header.jsx';
-import TabBurgerIngredients from '../burger-Ingredients/burger-Ingredients.jsx'
-import BurgerConstructor from '../burger-constructor/burger-constructor.jsx'
-import { urlIngredients } from '../../utils/config.js'
+import TabBurgerIngredients from '../burger-Ingredients/burger-Ingredients.jsx';
+import BurgerConstructor from '../burger-constructor/burger-constructor.jsx';
+import { checkResponse, baseUrl } from '../../utils/apiConfig.js';
+import { IngredientsContext } from '../../services/context';
 
 function App() {
   const [ingredients, setIngredients] = useState();
   useEffect(() => {
     async function getIngredients() {
       try {
-        const res = await fetch(urlIngredients);
-        if (res.ok) {
-          const data = await res.json();
-          setIngredients(data)
-        } else {
-          return Promise.reject(`Ошибка ${res.status}`);
-        }
+        const res = await fetch(`${baseUrl}ingredients`);
+        const data = await checkResponse(res)
+        setIngredients(data)
       }
-      catch(error) {
+      catch (error) {
         console.log(`Произошла ошибка: ${error}`);
       }
     }
@@ -27,13 +24,15 @@ function App() {
 
   return (
     <>
-      <AppHeader />
-      {ingredients && (
-        <main className={style.main}>
-          <TabBurgerIngredients data={ingredients.data} />
-          <BurgerConstructor data={ingredients.data} />
-        </main>
-      )}
+      <IngredientsContext.Provider value={ingredients}>
+        <AppHeader />
+        {ingredients && (
+          <main className={style.main}>
+            <TabBurgerIngredients />
+            <BurgerConstructor />
+          </main>
+        )}
+      </IngredientsContext.Provider>
     </>
   )
 }
