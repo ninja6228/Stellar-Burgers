@@ -10,8 +10,8 @@ function App() {
   const [ingredients, setIngredients] = useState();
   useEffect(() => {
     async function getIngredients() {
-      const res = await fetch(`${baseUrl}ingredients`);
       try {
+        const res = await fetch(`${baseUrl}ingredients`);
         const data = await checkResponse(res)
         setIngredients(data)
       }
