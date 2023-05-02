@@ -1,0 +1,36 @@
+.cardIngredient__wrapperCard {
+  width: 272px;
+  height: 208px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.cardIngredient__img {
+  height: 100%;
+}
+
+.cardIngredient__img:hover {
+  cursor: pointer;
+  transform: scale(1.2);
+  transition: all .2s linear;
+}
+
+.cardIngredient__wrapperPrice {
+  display: flex;
+  gap: 10px;
+}
+
+.cardIngredient__name {
+  text-align: center;
+}
+
+.isDrag {
+  box-shadow:
+    0px 0px 16px rgba(51, 51, 255, 0.25),
+    0px 0px 8px rgba(51, 51, 255, 0.25),
+    0px 4px 32px rgba(51, 51, 255, 0.5);
+  border-radius: 40px;
+}
+

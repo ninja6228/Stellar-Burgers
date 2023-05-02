@@ -1,34 +1,9 @@
-.cardIngredient__wrapperCard {
-  width: 272px;
-  height: 208px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  position: relative;
-}
-
-.cardIngredient__img {
-  height: 100%;
-}
-
-.cardIngredient__img:hover {
-  cursor: pointer;
-  opacity: 0.7;
-  transition: opacity .2s linear;
-}
-
-
-.cardIngredient__wrapperPrice {
-  display: flex;
-  gap: 10px;
-}
-
-.cardIngredient__name {
-  text-align: center;
-}
-
 .navMenuIngredients__wrapper {
   display: flex;
+}
+
+.navMenuIngredients__link {
+  text-decoration: none;
 }
 
 .listIngredients {

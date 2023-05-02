@@ -1,51 +1,97 @@
 import PropTypes from 'prop-types';
-import { useState, useMemo, useContext } from 'react';
+import { useMemo, useRef } from 'react';
+import { useDispatch, useSelector } from "react-redux";
 import { CurrencyIcon, DragIcon, Button, ConstructorElement } from '@ya.praktikum/react-developer-burger-ui-components';
+import { useDrop, useDrag } from "react-dnd";
+
 import { ingredientType } from '../../utils/types.js'
 import style from '../burger-constructor/burger-constructor.module.css'
 import OrderDetails from '../order-details/order-details.jsx'
 import Modal from "../modal/modal";
-import { checkResponse, baseUrl } from '../../utils/apiConfig.js';
+import { postOrder, ORDER_ITEMS_RESET, REMOVE_INGREDIENT, ADD_INGREDIENT, ADD_BUN, MOVE_INGREDIENT } from '../../services/actions/order.js'
 
-import { IngredientsContext } from '../../services/context.js';
+function СardIngredient({ ingredient, index }) {
+  const dispatch = useDispatch();
 
-// массив ингредиентов без булочек
-function listIngredients({ data }) {
-  const ingredients = data.filter(item => {
-    return item.type !== 'bun';
-  })
-  return ingredients
-};
+  const ref = useRef(null);
 
-// массив только с булочками
-function listBuns({ data }) {
-  const buns = data.filter(item => {
-    return item.type === 'bun';
-  })
-  return buns
-};
+  const moveCardHandler = (dragIndex, hoverIndex) => {
+    dispatch({
+      type: MOVE_INGREDIENT,
+      dragIndex,
+      hoverIndex
+    })
+  }
 
-// Компонент с карточкой ингредиента 
-function СardIngredient({ ingredient }) {
-  const { name, price, image } = ingredient
+  const [{ isDragging }, drag] = useDrag({
+    type: 'sortable',
+    item: () => {
+      return { ...ingredient, index };
+    },
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  });
+
+  const opacity = isDragging ? 0 : 1;
+
+  const [, drop] = useDrop({
+    accept: 'sortable',
+    hover(item, monitor) {
+      if (!ref.current) {
+        return;
+      }
+      const dragIndex = item.index;
+      const hoverIndex = index;
+      if (dragIndex === hoverIndex) {
+        return;
+      }
+      const hoverBoundingRect = ref.current?.getBoundingClientRect();
+      const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
+      const clientOffset = monitor.getClientOffset();
+      const hoverClientY = clientOffset.y - hoverBoundingRect.top;
+      if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
+        return;
+      }
+      if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
+        return;
+      }
+      moveCardHandler(dragIndex, hoverIndex);
+      item.index = hoverIndex
+    },
+  });
+
+  drag(drop(ref))
+
+
+
+  const handleRemoveIngredient = () => {
+    dispatch({
+      type: REMOVE_INGREDIENT,
+      id: ingredient.id
+    })
+  }
+
   return (
-    <li className={`${style.cardIngredient} mb-4`}>
-      <div className={`${style.cardIngredient__icon} ml-2`}><DragIcon type='primary' /></div>
+    <li className={`${style.cardIngredient} mb-4`} style={{ opacity: opacity }} ref={ref}>
+      <div className={`${style.cardIngredient__icon} ml-2`}>
+        <DragIcon type='primary' />
+      </div>
       <ConstructorElement
         isLocked={false}
-        text={name}
-        price={price}
-        thumbnail={image}
+        text={ingredient.name}
+        price={ingredient.price}
+        thumbnail={ingredient.image}
+        handleClose={handleRemoveIngredient}
       />
-    </li>
+    </li >
   )
 };
-
 СardIngredient.propTypes = {
   ingredient: PropTypes.shape(ingredientType)
 }
 
-// Компонент с карточкой булочки, в зависимости от переданной позиции меняется описание 
+
 function CardBuns({ position, buns }) {
   const positionBun = position === 'top' ? `(верх)` : `(низ)`;
   return (
@@ -60,85 +106,98 @@ function CardBuns({ position, buns }) {
     </div>
   )
 };
-
 CardBuns.propTypes = {
   position: PropTypes.string.isRequired,
   buns: PropTypes.shape(ingredientType)
 };
 
-// Компонент с финальной суммой всех инградиентов и кнопкой для потверждения заказа
-function PurchaseAmount({ ingredients, buns, idIngredients }) {
-  const [active, setActive] = useState(false)
-  const [orderData, setOrderData] = useState()
-  const arrayForPrices = [];
-  ingredients.map(item => arrayForPrices.push(item.price))
-  const totalValueIngredients = useMemo(() => arrayForPrices.reduce(
-    (sum, price) => sum + price, 0) + (buns * 2), [arrayForPrices, buns]
-  )
 
-  function handleClose() {
-    setActive(false)
+function PurchaseAmount({ ingredients, buns }) {
+  const dispatch = useDispatch();
+  const { orderDetails, active } = useSelector(store => store.order);
+
+  const idIngredients = [buns._id, ...ingredients.map(item => item._id), buns._id]
+
+  const handleOpen = () => {
+    dispatch(
+      postOrder(idIngredients)
+    )
   }
 
-  async function sendAnOrder() {
-    try {
-      const res = await fetch(`${baseUrl}orders`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': "application/json"
-        },
-        body: JSON.stringify({
-          ingredients: idIngredients,
-        }),
-      });
-      const data = await checkResponse(res)
-      setOrderData(data)
-      setActive(true);
-    }
-    catch (error) {
-      console.log(`Произошла ошибка: ${error}`);
-    }
+  const handleClose = () => {
+    dispatch({
+      type: ORDER_ITEMS_RESET
+    })
   }
+
+  const totalPrice = useMemo(() => {
+    let ingredientPrice = ingredients.reduce((sum, item) => { return item.price + sum }, 0)
+    return ingredientPrice + (buns.price * 2)
+  }, [ingredients, buns])
+
   return (
     <section className={`${style.purchaseAmount__wrapper} mt-10 mr-5`}>
       <span className='text text_type_digits-medium mr-10'>
-        {totalValueIngredients}
+        {totalPrice}
         <CurrencyIcon />
       </span>
-      <Button htmlType="button" type="primary" size="large" onClick={sendAnOrder}>Оформить заказ</Button>
+      <Button htmlType="button" type="primary" size="large" onClick={handleOpen}>Оформить заказ</Button>
       {
         active && (
           <Modal onClose={handleClose}>
-            <OrderDetails orderDetails={orderData} />
+            <OrderDetails orderDetails={orderDetails} />
           </Modal>
         )}
     </section>
   )
 };
-
 PurchaseAmount.propTypes = {
-  idIngredients: PropTypes.array.isRequired,
   ingredients: PropTypes.array.isRequired,
-  buns: PropTypes.number.isRequired
+  buns: PropTypes.object.isRequired
 }
 
-// Компонент принемающий в себя выбранные инградиенты и собирающий в себя все остальный компоненты для этого блока 
+
 function BurgerConstructor() {
-  const initialIngredients = useContext(IngredientsContext);
-  const buns = listBuns(initialIngredients)
-  const ingredients = listIngredients(initialIngredients)
-  const idIngredients = initialIngredients.data.map(item => item._id)
+  const dispatch = useDispatch();
+  const { list, bun } = useSelector(store => store.order)
+  const randomID = getRandom()
+
+  function getRandom() {
+    return Math.random();
+  }
+
+  const moveIngredient = (ingredient) => {
+    dispatch({
+      type: ingredient.type === 'bun' ? ADD_BUN : ADD_INGREDIENT,
+      item: { ...ingredient, id: randomID }
+    })
+  }
+
+  const [{ isHover }, dropTarget] = useDrop({
+    accept: 'ingredients',
+    collect: monitor => ({
+      isHover: monitor.isOver()
+    }),
+    drop(item) {
+      moveIngredient(item);
+    }
+  }) 
+
   return (
-    <section className={`${style.section} mt-25 pr-4 pl-2`}>
-      <CardBuns position={'top'} buns={buns[0]} />
-      <ul className={`${style.sectionList} mt-3 pr-3`}>
-        {ingredients.map((item) => {
-          return <СardIngredient ingredient={item} key={item._id} />
-        })}
-      </ul>
-      <CardBuns position={'bottom'} buns={buns[0]} />
-      <PurchaseAmount ingredients={ingredients} buns={buns[0].price} idIngredients={idIngredients} />
-    </section>
+    (list.length || bun) ?
+      <section className={`${style.section} mt-25 pr-4 pl-2`} ref={dropTarget} >
+        {bun ? <CardBuns position={'top'} buns={bun} /> : <p className={`${style.clearList_bun} ${isHover ? style.item_isHovering : ''} text text_type_main-default`}>Выберите булочку и добавьте её сюда</p>}
+        <ul className={`${style.sectionList} mt-3 pr-3`}>
+          {list.length ? list.map((item, i) => { return <СardIngredient ingredient={item} key={i} index={i} /> })
+            : <p className={`${style.clearList_ing} ${isHover ? style.item_isHovering : ''}  text text_type_main-default`}>Выберите ингредиенты и добавьте их сюда</p>}
+        </ul>
+        {bun ? <CardBuns position={'bottom'} buns={bun} /> : null}
+        {((list.length > 0 && bun) ? (< PurchaseAmount ingredients={list} buns={bun} />) : null)}
+      </section >
+      :
+      <section className={`${style.section} mt-25 pr-4 pl-2`} ref={dropTarget} >
+        <div className={`${style.clearList} ${isHover ? style.item_isHovering : ''} text text_type_main-medium`}>Переместите сюда<br />любимую булку и ингредиенты</div>
+      </section>
   )
 };
 

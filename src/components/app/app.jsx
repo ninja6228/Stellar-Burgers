@@ -1,40 +1,37 @@
-import { useState, useEffect } from 'react';
 import style from '../app/app.module.css';
 import AppHeader from '../app-header/app-header.jsx';
 import TabBurgerIngredients from '../burger-Ingredients/burger-Ingredients.jsx';
 import BurgerConstructor from '../burger-constructor/burger-constructor.jsx';
-import { checkResponse, baseUrl } from '../../utils/apiConfig.js';
-import { IngredientsContext } from '../../services/context';
+import { useSelector, useDispatch } from "react-redux";
+import { useEffect } from "react";
+import { getIngredients } from '../../services/actions/ingredients'
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 
 function App() {
-  const [ingredients, setIngredients] = useState();
+  const dispatch = useDispatch();
+  const { error } = useSelector((store) => store.ingredients);
+
   useEffect(() => {
-    async function getIngredients() {
-      try {
-        const res = await fetch(`${baseUrl}ingredients`);
-        const data = await checkResponse(res)
-        setIngredients(data)
-      }
-      catch (error) {
-        console.log(`Произошла ошибка: ${error}`);
-      }
-    }
-    getIngredients();
-  }, [])
+    dispatch(getIngredients());
+  }, [dispatch]);
 
   return (
-    <>
-      <IngredientsContext.Provider value={ingredients}>
-        <AppHeader />
-        {ingredients && (
+    error ? <h2 className={style.error}>Произошла ошибка 👽 попробуйте перезагрузить страницу</h2>
+      : (
+        <>
+          <AppHeader />
           <main className={style.main}>
-            <TabBurgerIngredients />
-            <BurgerConstructor />
+            <DndProvider backend={HTML5Backend}>
+              <TabBurgerIngredients />
+              <BurgerConstructor />
+            </DndProvider>
           </main>
-        )}
-      </IngredientsContext.Provider>
-    </>
+        </>
+      )
+      
   )
 }
+
 
 export default App

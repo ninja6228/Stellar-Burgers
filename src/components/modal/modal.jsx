@@ -9,6 +9,26 @@ const modals = document.getElementById('modals');
 
 function Modal({ children, onClose }) {
 
+  useEffect(() => {
+    const closePressingEsc = (evt) => {
+      if (evt.key === 'Escape') {
+        onClose()
+      }
+    }
+
+    document.addEventListener("keydown", closePressingEsc)
+    return () => {
+      document.removeEventListener("keydown", closePressingEsc
+      )
+    }
+  })
+
+  function closeClickOverlay(evt) {
+    if (evt.target === evt.currentTarget) {
+      onClose()
+    }
+  }
+
   const modal = (
     <ModalOverlay clickModalOverlay={closeClickOverlay}>
       <div className={style.wrapper}>
@@ -18,23 +38,6 @@ function Modal({ children, onClose }) {
         {children}
       </div>
     </ModalOverlay>)
-
-
-  useEffect(() => {
-    function closePressingEsc(evt) {
-      if (evt.key === 'Escape') {
-        onClose()
-      }
-    }
-    document.addEventListener("keydown", closePressingEsc)
-    return () => { document.removeEventListener("keydown", closePressingEsc) }
-  }, [])
-
-  function closeClickOverlay(evt) {
-    if (evt.target === evt.currentTarget) {
-      onClose()
-    }
-  }
 
   return createPortal(modal, modals)
 };
