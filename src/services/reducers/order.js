@@ -10,10 +10,9 @@ import {
 } from '../actions/order'
 
 const initialState = {
-  active: false,
   list: [],
   bun: null,
-  orderDetails: [],
+  orderDetails: null,
   request: false,
   failed: false,
 };
@@ -29,7 +28,6 @@ export const orderReducer = (state = initialState, action) => {
     case GET_ORDER_ITEMS_SUCCESS:
       return {
         ...state,
-        active: true,
         orderDetails: action.orderDetails,
       }
     case GET_ORDER_ITEMS_FAILED:
@@ -57,8 +55,7 @@ export const orderReducer = (state = initialState, action) => {
       return {
         ...state,
         isLoaded: false,
-        orderDetails: [],
-        active: false,
+        orderDetails: null,
         list: [],
         bun: null
       }

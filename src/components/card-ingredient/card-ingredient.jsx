@@ -1,12 +1,14 @@
 import PropTypes from 'prop-types';
+import { useMemo } from 'react';
 import { Counter, CurrencyIcon } from '@ya.praktikum/react-developer-burger-ui-components';
 import { ingredientType } from '../../utils/types.js';
 import { useSelector } from "react-redux";
 import { useDrag } from "react-dnd";
 import style from './card-ingredient.module.css';
-
+import { typeIngredient } from '../../utils/constants';
 
 function CardIngredient({ card, onOpen }) {
+  const { BUN } = typeIngredient
   const { _id, type, image, name, price } = card;
   const { list, bun } = useSelector(store => store.order)
 
@@ -18,10 +20,11 @@ function CardIngredient({ card, onOpen }) {
     })
   });
 
-  let ingredientsCount = list.filter((item) => item._id === _id).length;
-  let counter = type === 'bun' && bun && bun._id === _id
-    ? 2 : type !== 'bun' && ingredientsCount
-      ? ingredientsCount : '';
+  const counters = useMemo(() => {
+    let ingredientsCount = list.filter((item) => item._id === _id).length;
+    let counter = (type === BUN && bun && bun._id === _id ? 2 : type !== BUN && ingredientsCount ? ingredientsCount : '')
+    return counter
+  }, [_id, bun, list, type, BUN])
 
   return (
     <>
@@ -32,14 +35,15 @@ function CardIngredient({ card, onOpen }) {
           <CurrencyIcon type='primary' />
         </div>
         <p className={`${style.cardIngredient__name} text text_type_main-default mb-7`}>{name}</p>
-        {counter ? <Counter count={counter} size="default" /> : null}
+        {counters ? <Counter count={counters} size="default" /> : null}
       </li>
     </>
   )
 };
 
 CardIngredient.propTypes = {
-  card: PropTypes.shape(ingredientType)
+  card: PropTypes.shape(ingredientType).isRequired,
+  onOpen: PropTypes.func.isRequired
 };
 
 export default CardIngredient;

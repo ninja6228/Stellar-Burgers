@@ -1,6 +1,6 @@
 import style from '../app/app.module.css';
 import AppHeader from '../app-header/app-header.jsx';
-import TabBurgerIngredients from '../burger-Ingredients/burger-Ingredients.jsx';
+import TabBurgerIngredients from '../tab-burger-ingredients/tab-burger-ingredients.jsx';
 import BurgerConstructor from '../burger-constructor/burger-constructor.jsx';
 import { useSelector, useDispatch } from "react-redux";
 import { useEffect } from "react";

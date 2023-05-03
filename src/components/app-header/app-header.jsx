@@ -1,7 +1,6 @@
 import { Logo, BurgerIcon, ListIcon, ProfileIcon } from '@ya.praktikum/react-developer-burger-ui-components';
 import style from '../app-header/app-header.module.css'
 
-// Компонент собирающий в себе весь блок header
 function AppHeader() {
   return (
     <header className={style.header}>
@@ -34,7 +33,6 @@ function AppHeader() {
       </section>
     </header>
   )
-
 }
 
 export default AppHeader;

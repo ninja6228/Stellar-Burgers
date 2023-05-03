@@ -10,8 +10,7 @@ const initialState = {
   ingredients: [],
   loaded: false,
   error: false,
-  active: false,
-  selectedIngredient: [],
+  selectedIngredient: null,
 };
 
 export const ingredientsReducer = (state = initialState, action) => {
@@ -35,14 +34,13 @@ export const ingredientsReducer = (state = initialState, action) => {
     case SET_SELECTED_INGREDIENT:
       return {
         ...state,
-        active: true,
+        error: false,
         selectedIngredient: action.ingadient
       }
     case REMOVE_SELECTED_INGREDIENTL:
       return {
         ...state,
-        active: false,
-        selectedIngredient: []
+        selectedIngredient: null
       }
     default: {
       return state;

@@ -19,28 +19,6 @@
   background-color: #8585AD;
 }
 
-.cardIngredient {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: pointer;
-}
-
-.cardIngredient__icon {
-  width: 24px;
-  height: 24px;
-}
-
-.purchaseAmount__wrapper {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-}
-
-.cardBuns {
-  composes: purchaseAmount__wrapper;
-}
-
 .clearList {
   height: 40vh;
   border: 3px blue dashed;
