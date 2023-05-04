@@ -19,23 +19,43 @@
   background-color: #8585AD;
 }
 
-.cardIngredient {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.clearList {
+  height: 40vh;
+  border: 3px blue dashed;
+  opacity: 0.5;
+  text-align: center;
+  padding-top: 55%;
+  border-radius: 40px;
+  transition: all .3s linear;
 }
 
-.cardIngredient__icon {
-  width: 24px;
-  height: 24px;
+.clearList_ing {
+  height: 15vh;
+  border: 3px blue dashed;
+  opacity: 0.5;
+  text-align: center;
+  padding-top: 35%;
+  padding-bottom: 15%;
+  font-size: 22px;
+  border-radius: 40px;
+  transition: all .3s linear;
 }
 
-.purchaseAmount__wrapper {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
+
+.clearList_bun {
+  height: 5vh;
+  border: 3px blue dashed;
+  opacity: 0.5;
+  text-align: center;
+  padding-top: 10%;
+  padding-bottom: 10%;
+  font-size: 25px;
+  border-radius: 40px;
+  transition: all .3s linear;
 }
 
-.cardBuns {
-  composes: purchaseAmount__wrapper;
+.item_isHovering {
+  opacity: 0.8;
+  border: 3px dashed green;
+  border-radius: 40px;
 }

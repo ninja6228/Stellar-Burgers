@@ -5,3 +5,10 @@
   grid-template-columns: repeat(2, 1fr);
   column-gap: 40px;
 }
+
+.error {
+  position: absolute;
+  font-size: 30px;
+  top: 40%;
+  left: 26%;
+}

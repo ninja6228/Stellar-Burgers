@@ -1,146 +1,53 @@
-import PropTypes from 'prop-types';
-import { useState, useMemo, useContext } from 'react';
-import { CurrencyIcon, DragIcon, Button, ConstructorElement } from '@ya.praktikum/react-developer-burger-ui-components';
-import { ingredientType } from '../../utils/types.js'
+import { useDispatch, useSelector } from "react-redux";
+import { useDrop } from "react-dnd";
+
 import style from '../burger-constructor/burger-constructor.module.css'
-import OrderDetails from '../order-details/order-details.jsx'
-import Modal from "../modal/modal";
-import { checkResponse, baseUrl } from '../../utils/apiConfig.js';
+import { ADD_INGREDIENT, ADD_BUN } from '../../services/actions/order.js'
+import { randomID } from '../../utils/burger-constructor.utils.js'
+import { typeIngredient } from '../../utils/constants.js'
+import PurchaseAmount from '../purchase-amount/purchase-amount.jsx'
+import CardBuns from '../burger-constructor-card/card-buns/card-buns.jsx';
+import СardOther from '../burger-constructor-card/card-other/card-other';
 
-import { IngredientsContext } from '../../services/context.js';
-
-// массив ингредиентов без булочек
-function listIngredients({ data }) {
-  const ingredients = data.filter(item => {
-    return item.type !== 'bun';
-  })
-  return ingredients
-};
-
-// массив только с булочками
-function listBuns({ data }) {
-  const buns = data.filter(item => {
-    return item.type === 'bun';
-  })
-  return buns
-};
-
-// Компонент с карточкой ингредиента 
-function СardIngredient({ ingredient }) {
-  const { name, price, image } = ingredient
-  return (
-    <li className={`${style.cardIngredient} mb-4`}>
-      <div className={`${style.cardIngredient__icon} ml-2`}><DragIcon type='primary' /></div>
-      <ConstructorElement
-        isLocked={false}
-        text={name}
-        price={price}
-        thumbnail={image}
-      />
-    </li>
-  )
-};
-
-СardIngredient.propTypes = {
-  ingredient: PropTypes.shape(ingredientType)
-}
-
-// Компонент с карточкой булочки, в зависимости от переданной позиции меняется описание 
-function CardBuns({ position, buns }) {
-  const positionBun = position === 'top' ? `(верх)` : `(низ)`;
-  return (
-    <div className={`${style.cardBuns} mr-2 ml-8 pr-3`}>
-      <ConstructorElement
-        type={position}
-        isLocked={true}
-        text={`${buns.name} ${positionBun}`}
-        price={buns.price}
-        thumbnail={buns.image}
-      />
-    </div>
-  )
-};
-
-CardBuns.propTypes = {
-  position: PropTypes.string.isRequired,
-  buns: PropTypes.shape(ingredientType)
-};
-
-// Компонент с финальной суммой всех инградиентов и кнопкой для потверждения заказа
-function PurchaseAmount({ ingredients, buns, idIngredients }) {
-  const [active, setActive] = useState(false)
-  const [orderData, setOrderData] = useState()
-  const arrayForPrices = [];
-  ingredients.map(item => arrayForPrices.push(item.price))
-  const totalValueIngredients = useMemo(() => arrayForPrices.reduce(
-    (sum, price) => sum + price, 0) + (buns * 2), [arrayForPrices, buns]
-  )
-
-  function handleClose() {
-    setActive(false)
-  }
-
-  async function sendAnOrder() {
-    try {
-      const res = await fetch(`${baseUrl}orders`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': "application/json"
-        },
-        body: JSON.stringify({
-          ingredients: idIngredients,
-        }),
-      });
-      const data = await checkResponse(res)
-      setOrderData(data)
-      setActive(true);
-    }
-    catch (error) {
-      console.log(`Произошла ошибка: ${error}`);
-    }
-  }
-  return (
-    <section className={`${style.purchaseAmount__wrapper} mt-10 mr-5`}>
-      <span className='text text_type_digits-medium mr-10'>
-        {totalValueIngredients}
-        <CurrencyIcon />
-      </span>
-      <Button htmlType="button" type="primary" size="large" onClick={sendAnOrder}>Оформить заказ</Button>
-      {
-        active && (
-          <Modal onClose={handleClose}>
-            <OrderDetails orderDetails={orderData} />
-          </Modal>
-        )}
-    </section>
-  )
-};
-
-PurchaseAmount.propTypes = {
-  idIngredients: PropTypes.array.isRequired,
-  ingredients: PropTypes.array.isRequired,
-  buns: PropTypes.number.isRequired
-}
-
-// Компонент принемающий в себя выбранные инградиенты и собирающий в себя все остальный компоненты для этого блока 
 function BurgerConstructor() {
-  const initialIngredients = useContext(IngredientsContext);
-  const buns = listBuns(initialIngredients)
-  const ingredients = listIngredients(initialIngredients)
-  const idIngredients = initialIngredients.data.map(item => item._id)
+  const dispatch = useDispatch();
+  const { BUN } = typeIngredient
+  const { list, bun } = useSelector(store => store.order)
+  const uniqueId = randomID()
+
+  const moveIngredient = (ingredient) => {
+    dispatch({
+      type: ingredient.type === BUN ? ADD_BUN : ADD_INGREDIENT,
+      item: { ...ingredient, id: uniqueId }
+    })
+  }
+
+  const [{ isHover }, dropTarget] = useDrop({
+    accept: 'ingredients',
+    collect: monitor => ({
+      isHover: monitor.isOver()
+    }),
+    drop(item) {
+      moveIngredient(item);
+    }
+  })
+
   return (
-    <section className={`${style.section} mt-25 pr-4 pl-2`}>
-      <CardBuns position={'top'} buns={buns[0]} />
-      <ul className={`${style.sectionList} mt-3 pr-3`}>
-        {ingredients.map((item) => {
-          return <СardIngredient ingredient={item} key={item._id} />
-        })}
-      </ul>
-      <CardBuns position={'bottom'} buns={buns[0]} />
-      <PurchaseAmount ingredients={ingredients} buns={buns[0].price} idIngredients={idIngredients} />
-    </section>
+    (list.length || bun) ?
+      <section className={`${style.section} mt-25 pr-4 pl-2`} ref={dropTarget} >
+        {bun ? <CardBuns position={'top'} buns={bun} /> : <p className={`${style.clearList_bun} ${isHover ? style.item_isHovering : ''} text text_type_main-default`}>Выберите булочку и добавьте её сюда</p>}
+        <ul className={`${style.sectionList} mt-3 pr-3`}>
+          {list.length ? list.map((item, i) => { return <СardOther ingredient={item} key={i} index={i} /> })
+            : <p className={`${style.clearList_ing} ${isHover ? style.item_isHovering : ''}  text text_type_main-default`}>Выберите ингредиенты и добавьте их сюда</p>}
+        </ul>
+        {bun ? <CardBuns position={'bottom'} buns={bun} /> : null}
+        {((list.length > 0 && bun) ? (< PurchaseAmount ingredients={list} buns={bun} />) : null)}
+      </section >
+      :
+      <section className={`${style.section} mt-25 pr-4 pl-2`} ref={dropTarget} >
+        <div className={`${style.clearList} ${isHover ? style.item_isHovering : ''} text text_type_main-medium`}>Переместите сюда<br />любимую булку и ингредиенты</div>
+      </section>
   )
 };
-
 
 export default BurgerConstructor
