@@ -7,16 +7,23 @@ import Modal from "../modal/modal";
 import OrderDetails from '../order-details/order-details.jsx'
 import style from './purchase-amount.module.css'
 import { ingredientType } from '../../utils/types.js';
+import { useNavigate } from 'react-router-dom';
 
 function PurchaseAmount({ ingredients, buns }) {
   const dispatch = useDispatch();
-  const { orderDetails } = useSelector(store => store.order);
-  
+  const { orderDetails } = useSelector(state => state.order);
+  const { isAuth } = useSelector(state => state.user);
+  const navigate = useNavigate();
+
   const sendOrder = () => {
     const idIngredients = [buns._id, ...ingredients.map(item => item._id), buns._id]
-    dispatch(
-      postOrder(idIngredients)
-    )
+    if (isAuth) {
+      dispatch(
+        postOrder(idIngredients)
+      )
+    } else {
+      navigate('/login')
+    }
   }
 
   const handleClose = () => {

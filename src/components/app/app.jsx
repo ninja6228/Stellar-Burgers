@@ -1,37 +1,59 @@
+import { useEffect } from 'react';
 import style from '../app/app.module.css';
 import AppHeader from '../app-header/app-header.jsx';
-import TabBurgerIngredients from '../tab-burger-ingredients/tab-burger-ingredients.jsx';
-import BurgerConstructor from '../burger-constructor/burger-constructor.jsx';
 import { useSelector, useDispatch } from "react-redux";
-import { useEffect } from "react";
-import { getIngredients } from '../../services/actions/ingredients'
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
+import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import { Home, Login, Register, ForgotPassword, ResetPassword, PageNotFound, Profile } from '../../pages/index';
+import IngredientDetails from '../ingredient-details/ingredient-details';
+import ProtectedRoute from '../protected-route/protected-route';
+import Modal from '../modal/modal';
+import { getIngredients } from '../../services/actions/ingredients';
+import { getUser } from '../../services/actions/user';
+import { getCookie } from '../../utils/cookie';
 
 function App() {
   const dispatch = useDispatch();
-  const { error } = useSelector((store) => store.ingredients);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { error } = useSelector((state) => state.ingredients);
+  const background = location.state && location.state.background;
 
   useEffect(() => {
-    dispatch(getIngredients());
-  }, [dispatch]);
+    dispatch(getIngredients())
+  }, [])
+
+  useEffect(() => {
+    const accessToken = getCookie('token')
+    if (accessToken) {
+      dispatch(getUser())
+    }
+  },
+    []
+  );
 
   return (
-    error ? <h2 className={style.error}>Произошла ошибка 👽 попробуйте перезагрузить страницу</h2>
+    error
+      ? (<h2 className={style.error}>Произошла ошибка 👽 попробуйте перезагрузить страницу</h2>)
       : (
         <>
           <AppHeader />
-          <main className={style.main}>
-            <DndProvider backend={HTML5Backend}>
-              <TabBurgerIngredients />
-              <BurgerConstructor />
-            </DndProvider>
-          </main>
+          <main>
+            <Routes location={background || location}>
+              <Route path='/' element={<Home />} />
+              <Route path="/login" element={<ProtectedRoute element={<Login />} />} />
+              <Route path="/register" element={<ProtectedRoute element={<Register />} />} />
+              <Route path="/forgot-Password" element={<ProtectedRoute element={<ForgotPassword />} />} />
+              <Route path="/reset-password" element={<ProtectedRoute element={<ResetPassword />} />} />
+              <Route path='/profile' element={<ProtectedRoute isPrivate element={<Profile />} />} />
+              <Route path="/ingredients/:id" element={<IngredientDetails />} />
+              <Route path="*" element={<PageNotFound />} />
+            </Routes>
+            {background && <Routes> <Route path="/ingredients/:id" element={<Modal onClose={() => { navigate(-1) }}> <IngredientDetails /></Modal>} /> </Routes>}
+          </main >
         </>
       )
-      
+
   )
 }
-
 
 export default App
