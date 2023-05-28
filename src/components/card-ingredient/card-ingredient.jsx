@@ -22,7 +22,7 @@ function CardIngredient({ card, onOpen }) {
       isDrag: monitor.isDragging()
     })
   });
-
+  
   const counters = useMemo(() => {
     let ingredientsCount = list.filter((item) => item._id === _id).length;
     let counter = (type === BUN && bun && bun._id === _id ? 2 : type !== BUN && ingredientsCount ? ingredientsCount : '')

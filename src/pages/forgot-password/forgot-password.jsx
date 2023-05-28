@@ -1,23 +1,20 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import style from './forgot-password.module.css'
 import { Button, Input } from "@ya.praktikum/react-developer-burger-ui-components";
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { forgotPassword } from '../../services/actions/reset-password';
+import { useForm } from '../../hooks/useForm';
 
 function ForgotPassword() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
+  const { values, handleChange } = useForm({ email: '' })
   const { verification, err, emailRequest } = useSelector(state => state.password)
-
-  const onChange = e => {
-    setEmail(e.target.value);
-  }
 
   const reqestNewPassword = (e) => {
     e.preventDefault();
-    dispatch(forgotPassword(email));
+    dispatch(forgotPassword(values));
   }
 
   useEffect(() => {
@@ -36,8 +33,8 @@ function ForgotPassword() {
             type={"email"}
             name={'email'}
             extraClass={"mt-6"}
-            onChange={onChange}
-            value={email}
+            onChange={handleChange}
+            value={values.email}
             required
           />
           {err.err === 500 && (<h3 className={`${style.err}`}>Такой почты нет, убедитесь в правильности ввода</h3>)}
@@ -45,7 +42,7 @@ function ForgotPassword() {
             extraClass={"mt-6 mb-20"}
             type={"primary"}
             htmlType={'submit'}>
-            {emailRequest ? 'Отправляем...' : 'Восстановить'}
+            {emailRequest ? <p className={`text text_type_main-small ${style.forgotPassword__loading}`}>Отправляем...</p> : 'Восстановить'}
           </Button>
         </form>
 

@@ -3,7 +3,7 @@ import {
   GET_INGREDIENTS_SUCCESS,
   GET_INGREDIENTS_FAILED,
   SET_SELECTED_INGREDIENT,
-  REMOVE_SELECTED_INGREDIENTL
+  REMOVE_SELECTED_INGREDIENT
 } from '../actions/ingredients'
 
 const initialState = {
@@ -37,7 +37,7 @@ export const ingredientsReducer = (state = initialState, action) => {
         error: false,
         selectedIngredient: action.ingadient
       }
-    case REMOVE_SELECTED_INGREDIENTL:
+    case REMOVE_SELECTED_INGREDIENT:
       return {
         ...state,
         selectedIngredient: null

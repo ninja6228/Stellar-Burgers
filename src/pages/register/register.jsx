@@ -1,29 +1,18 @@
-import { useState } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Input, PasswordInput, EmailInput } from '@ya.praktikum/react-developer-burger-ui-components';
 import style from './register.module.css'
 import { Link } from 'react-router-dom';
 import { register } from '../../services/actions/user'
+import { useForm } from '../../hooks/useForm';
 
 function Register() {
   const dispatch = useDispatch();
   const { registerRequest } = useSelector(state => state.user);
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    name: ""
-  })
-
-  const onChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    })
-  }
-
+  const { values, handleChange} = useForm({ name: '', email: '', password: '' })
+  
   const onSubmitForm = (evt) => {
     evt.preventDefault();
-    dispatch(register(formData))
+    dispatch(register(values))
   }
 
   return (
@@ -35,24 +24,24 @@ function Register() {
             placeholder={"Имя"}
             name={"name"}
             extraClass={"mt-6"}
-            value={formData.name}
-            onChange={onChange}
+            value={values.name}
+            onChange={handleChange}
             required
           />
           <EmailInput
             placeholder={"E-mail"}
             name={"email"}
             extraClass={"mt-6"}
-            value={formData.email}
-            onChange={onChange}
+            value={values.email}
+            onChange={handleChange}
             required
           />
           <PasswordInput
             placeholder={"Пароль"}
             name={"password"}
             extraClass={"mt-6"}
-            value={formData.password}
-            onChange={onChange}
+            value={values.password}
+            onChange={handleChange}
             required
           />
           <Button
@@ -60,7 +49,7 @@ function Register() {
             type={"primary"}
             htmlType={'submit'}
           >
-            {registerRequest ? 'Регестрируем...' : 'Зарегестрироваться'}
+            {registerRequest ? <p className={`text text_type_main-small ${style.register__loading}`}>Регестрируем...</p> : 'Зарегестрироваться'}
           </Button>
         </form>
         <div className={`${style.login__links}`}>

@@ -1,4 +1,4 @@
-import { baseUrl, checkResponse } from "../../utils/apiConfig";
+import { request } from "../../utils/apiConfig";
 
 export const FORGOT_PASSWORD_REQUEST = 'FORGOT_PASSWORD_REQUEST';
 export const FORGOT_PASSWORD_SUCCESS = 'FORGOT_PASSWORD_SUCCESS';
@@ -13,44 +13,37 @@ export const forgotPassword = (formData) => {
     dispatch({
       type: FORGOT_PASSWORD_REQUEST
     })
-    fetch(`${baseUrl}password-reset`, {
+    request('password-reset', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ email: formData })
+      body: JSON.stringify(formData)
     })
-      .then(res => checkResponse(res))
       .then(res => {
-        if (res && res.success) {
+        if (res) {
           dispatch({
             type: FORGOT_PASSWORD_SUCCESS,
             payload: res
           })
-        } else {
-          dispatch({
-            type: FORGOT_PASSWORD_FAILED,
-            err: res
-          })
         }
-      }
-      )
-      .catch(err => {
-        console.log(err)
+      })
+      .catch(error => {
         dispatch({
           type: FORGOT_PASSWORD_FAILED,
-          err: err
+          err: error
         })
+        console.log(`Ошибка: ${error}`);
       })
   }
-}
+};
 
-export function resetPassword(formData) {
+export const resetPassword = (formData) => {
   return function (dispatch) {
     dispatch({
       type: RESET_PASSWORD_REQUEST
     });
-    fetch(`${baseUrl}password-reset/reset`, {
+    request('password-reset/reset', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -60,23 +53,16 @@ export function resetPassword(formData) {
         token: formData.token
       })
     })
-      .then(res => checkResponse(res))
       .then(res => {
-        if (res && res.success) {
+        if (res) {
           dispatch({
             type: RESET_PASSWORD_SUCCESS
-          })
-        } else {
-          dispatch({
-            type: RESET_PASSWORD_FAILED
           })
         }
       })
       .catch(error => {
-        dispatch({
-          type: RESET_PASSWORD_FAILED,
-        });
+        dispatch({ type: RESET_PASSWORD_FAILED, });
         console.log(`Ошибка: ${error}`);
       })
   }
-}
+};

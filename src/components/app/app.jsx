@@ -10,6 +10,7 @@ import Modal from '../modal/modal';
 import { getIngredients } from '../../services/actions/ingredients';
 import { getUser } from '../../services/actions/user';
 import { getCookie } from '../../utils/cookie';
+import { REMOVE_SELECTED_INGREDIENT } from '../../services/actions/ingredients'
 
 function App() {
   const dispatch = useDispatch();
@@ -17,7 +18,7 @@ function App() {
   const location = useLocation();
   const { error } = useSelector((state) => state.ingredients);
   const background = location.state && location.state.background;
-
+  
   useEffect(() => {
     dispatch(getIngredients())
   }, [])
@@ -30,6 +31,13 @@ function App() {
   },
     []
   );
+
+  const closeModal = () => {
+    dispatch({
+      type: REMOVE_SELECTED_INGREDIENT
+    })
+    navigate(-1)
+  }
 
   return (
     error
@@ -48,7 +56,7 @@ function App() {
               <Route path="/ingredients/:id" element={<IngredientDetails />} />
               <Route path="*" element={<PageNotFound />} />
             </Routes>
-            {background && <Routes> <Route path="/ingredients/:id" element={<Modal onClose={() => { navigate(-1) }}> <IngredientDetails /></Modal>} /> </Routes>}
+            {background && <Routes> <Route path="/ingredients/:id" element={<Modal onClose={closeModal}> <IngredientDetails /></Modal>} /> </Routes>}
           </main >
         </>
       )

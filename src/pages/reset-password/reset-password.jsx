@@ -1,30 +1,20 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import style from './reset-password.module.css'
 import { Button, Input, PasswordInput } from "@ya.praktikum/react-developer-burger-ui-components";
 import { Link, useNavigate } from 'react-router-dom';
 import { resetPassword } from '../../services/actions/reset-password';
+import { useForm } from '../../hooks/useForm';
 
 function ResetPassword() {
   const dispatch = useDispatch();
   const { verification } = useSelector(state => state.password);
   const navigate = useNavigate();
-
-  const [formData, setFormData] = useState({
-    password: "",
-    token: ""
-  })
-
-  const onChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    })
-  }
+  const { values, handleChange} = useForm({ token: "", password: "" })
 
   const setNewPassword = (e) => {
     e.preventDefault();
-    dispatch(resetPassword(formData));
+    dispatch(resetPassword(values));
     navigate('/login')
   }
 
@@ -42,17 +32,17 @@ function ResetPassword() {
           <PasswordInput
             extraClass={"mt-6"}
             placeholder={"Введите новый пароль"}
-            value={formData.password}
+            value={values.password}
             name={'password'}
-            onChange={onChange}
+            onChange={handleChange}
             required
           />
           <Input
             extraClass={"mt-6"}
             placeholder={"Введите код из письма"}
-            value={formData.token}
+            value={values.token}
             name={'token'}
-            onChange={onChange}
+            onChange={handleChange}
             required
           />
           <Button

@@ -1,4 +1,4 @@
-import { baseUrl, checkResponse } from "../../utils/apiConfig";
+import { request } from "../../utils/apiConfig";
 import { setCookie, getCookie, deleteCookie } from "../../utils/cookie";
 
 export const USER_REGISTER_REQUEST = 'USER_REGISTER_REQUEST';
@@ -27,85 +27,62 @@ export const USER_UPDATE_TOKEN_FAILED = 'USER_UPDATE_TOKEN_FAILED';
 
 export const register = (form) => {
   return function (dispatch) {
-    dispatch({
-      type: USER_REGISTER_REQUEST
-    })
-    fetch(`${baseUrl}auth/register`, {
+    dispatch({ type: USER_REGISTER_REQUEST })
+    request('auth/register', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(form)
     })
-      .then(res => checkResponse(res))
       .then(res => {
-        if (res && res.success) {
+        if (res) {
           dispatch({
             type: USER_REGISTER_SUCCESS,
             form: res.user
           });
           setCookie('token', res.accessToken);
           localStorage.setItem('token', res.refreshToken);
-        } else {
-          dispatch({
-            type: USER_REGISTER_FAILED
-          })
         }
       })
-      .catch(err => {
-        console.log(err);
-        dispatch({
-          type: USER_REGISTER_FAILED
-        })
+      .catch(error => {
+        dispatch({ type: USER_REGISTER_FAILED })
+        console.log(`Ошибка: ${error}`);
       })
   }
 };
 
 export const login = (form) => {
   return function (dispatch) {
-    dispatch({
-      type: USER_LOGIN_REQUEST
-    })
-    fetch(`${baseUrl}auth/login`, {
+    dispatch({ type: USER_LOGIN_REQUEST })
+    request('auth/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(form)
     })
-      .then(res => checkResponse(res))
       .then(res => {
-        if (res && res.success) {
+        if (res) {
           dispatch({
             type: USER_LOGIN_SUCCESS,
             form: res.user
-          })
+          });
           setCookie('token', res.accessToken);
           localStorage.setItem('token', res.refreshToken);
-
-        } else {
-          dispatch({
-            type: USER_LOGIN_FAILED,
-            error: res
-          })
         }
       })
-      .catch(err => {
-        console.log(err);
-        dispatch({
-          type: USER_LOGIN_FAILED,
-          error: err
-        })
+      .catch(error => {
+        dispatch({ type: USER_LOGIN_FAILED, error: error })
+        console.log(`Ошибка: ${error}`);
       })
   }
 };
 
 export const logout = () => {
   return function (dispatch) {
-    dispatch({
-      type: USER_LOGOUT_REQUEST
-    })
-    fetch(`${baseUrl}auth/logout`, {
+    dispatch({ type: USER_LOGOUT_REQUEST })
+    request('auth/logout', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -114,48 +91,38 @@ export const logout = () => {
         token: localStorage.getItem('token'),
       })
     })
-      .then(res => checkResponse(res))
       .then(res => {
-        if (res && res.success) {
+        if (res) {
           dispatch({
-            type: USER_LOGOUT_SUCCESS,
-          })
+            type: USER_LOGOUT_SUCCESS
+          });
           deleteCookie('token');
           localStorage.removeItem('token');
-        } else {
-          dispatch({
-            type: USER_LOGOUT_FAILED
-          })
         }
       })
-      .catch(err => {
-        console.log(err);
-        dispatch({
-          type: USER_LOGOUT_FAILED
-        })
+      .catch(error => {
+        dispatch({ type: USER_LOGOUT_FAILED })
+        console.log(`Ошибка: ${error}`);
       })
   }
 };
 
-export function getUser() {
+export const getUser = () => {
   return function (dispatch) {
-    dispatch({
-      type: USER_GET_REQUEST
-    })
-    fetch(`${baseUrl}auth/user`, {
+    dispatch({ type: USER_GET_REQUEST })
+    request('auth/user', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
         Authorization: getCookie('token')
       }
     })
-      .then(res => checkResponse(res))
       .then(res => {
-        if (res && res.success) {
+        if (res) {
           dispatch({
             type: USER_GET_SUCCESS,
             form: res.user
-          })
+          });
         } else {
           dispatch(updateToken())
             .then(() => {
@@ -163,21 +130,17 @@ export function getUser() {
             })
         }
       })
-      .catch(err => {
-        console.log(err)
-        dispatch({
-          type: USER_GET_FAILED
-        });
+      .catch(error => {
+        dispatch({ type: USER_GET_FAILED })
+        console.log(`Ошибка: ${error}`);
       })
   }
 };
 
-export function updateUser(form) {
+export const updateUser = (form) => {
   return function (dispatch) {
-    dispatch({
-      type: USER_UPDATE_REQUEST
-    })
-    fetch(`${baseUrl}auth/user`, {
+    dispatch({ type: USER_UPDATE_REQUEST })
+    request('auth/user', {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -185,34 +148,25 @@ export function updateUser(form) {
       },
       body: JSON.stringify(form)
     })
-      .then(res => checkResponse(res))
       .then(res => {
-        if (res && res.success) {
+        if (res) {
           dispatch({
             type: USER_UPDATE_SUCCESS,
             form: res.user
-          })
-        } else {
-          dispatch({
-            type: USER_UPDATE_FAILED
           });
         }
       })
-      .catch(err => {
-        console.log(err)
-        dispatch({
-          type: USER_UPDATE_FAILED
-        });
+      .catch(error => {
+        dispatch({ type: USER_UPDATE_FAILED })
+        console.log(`Ошибка: ${error}`);
       })
   }
 };
 
-export function updateToken() {
+export const updateToken = () => {
   return function (dispatch) {
-    dispatch({
-      type: USER_UPDATE_TOKEN_REQUEST
-    })
-    fetch(`${baseUrl}auth/token`, {
+    dispatch({ type: USER_UPDATE_TOKEN_REQUEST })
+    request('auth/token', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -221,25 +175,18 @@ export function updateToken() {
         token: localStorage.getItem('token'),
       })
     })
-      .then(res => checkResponse(res))
       .then(res => {
-        if (res && res.success) {
+        if (res) {
+          dispatch({
+            USER_UPDATE_TOKEN_SUCCESS
+          });
           setCookie('token', res.accessToken);
           localStorage.setItem('token', res.refreshToken);
-          dispatch({
-            type: USER_UPDATE_TOKEN_SUCCESS
-          })
-        } else {
-          dispatch({
-            type: USER_UPDATE_TOKEN_FAILED
-          })
         }
       })
-      .catch((err) => {
-        console.log(err)
-        dispatch({
-          type: USER_UPDATE_TOKEN_FAILED
-        })
+      .catch(error => {
+        dispatch({ type: USER_UPDATE_TOKEN_FAILED })
+        console.log(`Ошибка: ${error}`);
       })
   }
 };

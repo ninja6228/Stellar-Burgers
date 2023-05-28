@@ -4,43 +4,36 @@ import { NavLink } from 'react-router-dom';
 import style from './profile.module.css';
 import { Input, Button, PasswordInput, EmailInput } from "@ya.praktikum/react-developer-burger-ui-components";
 import { logout, updateUser } from '../../services/actions/user';
+import { useForm } from '../../hooks/useForm';
 
 function Profile() {
   const dispatch = useDispatch();
   const user = useSelector(state => state.user.form);
   const [actionButtons, setActionButtons] = useState(false);
-
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: ""
-  })
+  const { values, handleChange, setValues } = useForm({ name: '', email: '', password: '' })
 
   useEffect(() => {
-    setFormData({
-      ...formData,
+    setValues({
+      ...values,
       email: user.email,
       name: user.name
     })
   }, [user])
 
-  const onChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    })
+  const onChange = (evt) => {
+    handleChange(evt)
     setActionButtons(true);
   }
 
-  const onSubmitForm = (e) => {
-    e.preventDefault();
-    dispatch(updateUser(formData));
+  const onSubmitForm = (evt) => {
+    evt.preventDefault();
+    dispatch(updateUser(values));
     setActionButtons(false);
   }
 
-  const handleCancel = (e) => {
-    e.preventDefault();
-    setFormData({
+  const handleCancel = (evt) => {
+    evt.preventDefault();
+    setValues({
       email: user.email,
       name: user.name,
       password: ""
@@ -75,7 +68,7 @@ function Profile() {
           type={'text'}
           placeholder={'Имя'}
           onChange={onChange}
-          value={formData.name}
+          value={values.name}
           name={"name"}
           icon={'EditIcon'}
           required
@@ -83,7 +76,7 @@ function Profile() {
         <EmailInput
           placeholder={'Логин'}
           onChange={onChange}
-          value={formData.email}
+          value={values.email}
           name={'email'}
           errorText={'Введите E-mail и не забудьте @'}
           icon={"EditIcon"}
@@ -92,7 +85,7 @@ function Profile() {
         <PasswordInput
           placeholder={"Пароль"}
           name={"password"}
-          value={formData.password}
+          value={values.password}
           icon="EditIcon"
           onChange={onChange}
         />

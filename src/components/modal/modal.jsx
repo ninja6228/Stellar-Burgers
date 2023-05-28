@@ -1,27 +1,18 @@
 import PropTypes from 'prop-types';
 import { createPortal } from "react-dom";
 import { useEffect } from "react";
-import { useDispatch } from "react-redux"
 import { CloseIcon } from '@ya.praktikum/react-developer-burger-ui-components';
 import style from './modal.module.css';
 import ModalOverlay from '../modal-overlay/modal-overlay.jsx'
-import { REMOVE_SELECTED_INGREDIENTL } from '../../services/actions/ingredients'
+
 const modals = document.getElementById('modals');
 
 function Modal({ children, onClose }) {
-  const dispatch = useDispatch();
-
-  const close = () => {
-    onClose()
-    dispatch({
-      type: REMOVE_SELECTED_INGREDIENTL
-    })
-  }
 
   useEffect(() => {
     const closePressingEsc = (evt) => {
       if (evt.key === 'Escape') {
-        close()
+        onClose()
       }
     }
     document.addEventListener("keydown", closePressingEsc)
@@ -29,11 +20,11 @@ function Modal({ children, onClose }) {
       document.removeEventListener("keydown", closePressingEsc
       )
     }
-  })
+  }, [])
 
-  function closeClickOverlay(evt) {
+  const closeClickOverlay = (evt) => {
     if (evt.target === evt.currentTarget) {
-      close()
+      onClose()
     }
   }
 
@@ -41,7 +32,7 @@ function Modal({ children, onClose }) {
     <ModalOverlay clickModalOverlay={closeClickOverlay}>
       <div className={style.wrapper}>
         <div className={`${style.positionIcon} mt-15 mr-10`}>
-          <CloseIcon type='primary' onClick={close} />
+          <CloseIcon type='primary' onClick={onClose} />
         </div>
         {children}
       </div>
