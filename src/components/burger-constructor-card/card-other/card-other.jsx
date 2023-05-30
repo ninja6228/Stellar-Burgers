@@ -4,7 +4,6 @@ import { useRef } from 'react';
 import { REMOVE_INGREDIENT, MOVE_INGREDIENT } from '../../../services/actions/order.js'
 import { useDrop, useDrag } from "react-dnd";
 import { DragIcon, ConstructorElement } from '@ya.praktikum/react-developer-burger-ui-components';
-
 import { ingredientType } from '../../../utils/types.js'
 import style from './card-other.module.css'
 
@@ -62,7 +61,7 @@ function СardOther({ ingredient, index }) {
   const handleRemoveIngredient = () => {
     dispatch({
       type: REMOVE_INGREDIENT,
-      id: ingredient.id
+      id: ingredient.uniqueId
     })
   }
 

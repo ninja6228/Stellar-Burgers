@@ -15,15 +15,14 @@ function Modal({ children, onClose }) {
         onClose()
       }
     }
-
     document.addEventListener("keydown", closePressingEsc)
     return () => {
       document.removeEventListener("keydown", closePressingEsc
       )
     }
-  })
+  }, [])
 
-  function closeClickOverlay(evt) {
+  const closeClickOverlay = (evt) => {
     if (evt.target === evt.currentTarget) {
       onClose()
     }

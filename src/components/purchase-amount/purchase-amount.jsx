@@ -7,16 +7,23 @@ import Modal from "../modal/modal";
 import OrderDetails from '../order-details/order-details.jsx'
 import style from './purchase-amount.module.css'
 import { ingredientType } from '../../utils/types.js';
+import { useNavigate } from 'react-router-dom';
 
 function PurchaseAmount({ ingredients, buns }) {
   const dispatch = useDispatch();
-  const { orderDetails } = useSelector(store => store.order);
-  
+  const { orderDetails, request } = useSelector(state => state.order);
+  const { isAuth } = useSelector(state => state.user);
+  const navigate = useNavigate();
+
   const sendOrder = () => {
     const idIngredients = [buns._id, ...ingredients.map(item => item._id), buns._id]
-    dispatch(
-      postOrder(idIngredients)
-    )
+    if (isAuth) {
+      dispatch(
+        postOrder(idIngredients)
+      )
+    } else {
+      navigate('/login')
+    }
   }
 
   const handleClose = () => {
@@ -32,11 +39,11 @@ function PurchaseAmount({ ingredients, buns }) {
 
   return (
     <section className={`${style.purchaseAmount__wrapper} mt-10 mr-5`}>
-      <span className='text text_type_digits-medium mr-10'>
+      <span className={`text text_type_digits-medium mr-10`}>
         {totalPrice}
         <CurrencyIcon />
       </span>
-      <Button htmlType="button" type="primary" size="large" onClick={sendOrder}>Оформить заказ</Button>
+      <Button htmlType="button" type="primary" size="large" onClick={sendOrder}>{request || orderDetails ? <p className={`text text_type_main-small ${style.purchaseAmount__loading}`}>Оформляем заказ...</p> : `Оформить заказ`}</Button>
       {
         orderDetails && (
           <Modal onClose={handleClose}>

@@ -9,12 +9,12 @@
 
 .cardIngredient__img {
   height: 100%;
+  transition: all .2s linear;
 }
 
 .cardIngredient__img:hover {
   cursor: pointer;
   transform: scale(1.2);
-  transition: all .2s linear;
 }
 
 .cardIngredient__wrapperPrice {

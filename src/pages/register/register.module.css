@@ -1,0 +1,50 @@
+.register__container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 180px;
+}
+
+.register__wrapper {
+  max-width: 480px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.register__form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.register__links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.register__link {
+  text-decoration: none;
+  transition-duration: .4s;
+}
+
+.register__link:hover {
+  opacity: 0.8;
+}
+
+.register__loading {
+  display:inline-block;
+  font-size: 18px;
+  clip-path: inset(0 3ch 0 0);
+  animation: step 1s steps(4) infinite;
+}
+
+@keyframes step {
+  to {
+    clip-path: inset(0 -1ch 0 0)
+  }
+}

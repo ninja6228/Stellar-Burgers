@@ -6,11 +6,14 @@ import { useSelector } from "react-redux";
 import { useDrag } from "react-dnd";
 import style from './card-ingredient.module.css';
 import { typeIngredient } from '../../utils/constants';
+import { Link, useLocation } from 'react-router-dom';
+
 
 function CardIngredient({ card, onOpen }) {
+  const location = useLocation();
   const { BUN } = typeIngredient
   const { _id, type, image, name, price } = card;
-  const { list, bun } = useSelector(store => store.order)
+  const { list, bun } = useSelector(state => state.order)
 
   const [{ isDrag }, dragRef] = useDrag({
     type: 'ingredients',
@@ -19,7 +22,7 @@ function CardIngredient({ card, onOpen }) {
       isDrag: monitor.isDragging()
     })
   });
-
+  
   const counters = useMemo(() => {
     let ingredientsCount = list.filter((item) => item._id === _id).length;
     let counter = (type === BUN && bun && bun._id === _id ? 2 : type !== BUN && ingredientsCount ? ingredientsCount : '')
@@ -28,15 +31,17 @@ function CardIngredient({ card, onOpen }) {
 
   return (
     <>
-      <li className={`${style.cardIngredient__wrapperCard} ${isDrag ? style.isDrag : null}`} ref={dragRef} >
-        <img className={`${style.cardIngredient__img} ml-4 mr-4 mb-2`} src={image} alt={name} id={_id} onClick={onOpen} />
+      <li className={`${style.cardIngredient__wrapperCard} ${isDrag ? style.isDrag : null}`} ref={dragRef} draggable >
+        <Link to={`/ingredients/${_id}`} state={{ background: location }} >
+          <img className={`${style.cardIngredient__img} ml-4 mr-4 mb-2`} src={image} alt={name} id={_id} onClick={onOpen} />
+        </Link>
         <div className={style.cardIngredient__wrapperPrice} >
           <p className='text text_type_digits-default mb-2'>{price}</p>
           <CurrencyIcon type='primary' />
         </div>
         <p className={`${style.cardIngredient__name} text text_type_main-default mb-7`}>{name}</p>
         {counters ? <Counter count={counters} size="default" /> : null}
-      </li>
+      </li >
     </>
   )
 };

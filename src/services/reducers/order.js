@@ -28,6 +28,7 @@ export const orderReducer = (state = initialState, action) => {
     case GET_ORDER_ITEMS_SUCCESS:
       return {
         ...state,
+        request: false,
         orderDetails: action.orderDetails,
       }
     case GET_ORDER_ITEMS_FAILED:
@@ -49,7 +50,7 @@ export const orderReducer = (state = initialState, action) => {
     case REMOVE_INGREDIENT:
       return {
         ...state,
-        list: [...state.list.filter((item) => item.id !== action.id)]
+        list: [...state.list.filter((item) => item.uniqueId !== action.id)]
       }
     case ORDER_ITEMS_RESET:
       return {
