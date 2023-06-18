@@ -1,4 +1,5 @@
 import { request } from '../../utils/apiConfig'
+import { getCookie } from '../../utils/cookie'
 
 export const GET_ORDER_ITEMS_REQUEST = 'ORDER_ITEMS_REQUEST'
 export const GET_ORDER_ITEMS_SUCCESS = 'ORDER_ITEMS_SUCCESS'
@@ -17,6 +18,7 @@ export const postOrder = (ingredientsOder) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: 'Bearer ' + getCookie('accessToken')
       },
       body: JSON.stringify({
         ingredients: ingredientsOder,

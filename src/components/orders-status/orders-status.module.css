@@ -1,0 +1,19 @@
+.numer__done {
+  color: rgba(0, 204, 204, 1);
+}
+
+.loader {
+  display: inline-block;
+  font-size: 20px;
+  clip-path: inset(0 1ch 0 0);
+  animation: step 1s steps(4) infinite;
+  position: absolute;
+  text-shadow: 0 0 16px rgb(51 51 255 / 25%), 0 0 8px rgb(51 51 255 / 25%), 0 4px 32px rgb(51 51 255 / 50%);
+
+}
+
+@keyframes step {
+  to {
+    clip-path: inset(0 -1ch 0 0)
+  }
+}

@@ -12,12 +12,13 @@ import { useNavigate } from 'react-router-dom';
 function PurchaseAmount({ ingredients, buns }) {
   const dispatch = useDispatch();
   const { orderDetails, request } = useSelector(state => state.order);
-  const { isAuth } = useSelector(state => state.user);
+  const { form: user } = useSelector(state => state.user);
   const navigate = useNavigate();
 
   const sendOrder = () => {
     const idIngredients = [buns._id, ...ingredients.map(item => item._id), buns._id]
-    if (isAuth) {
+
+    if (user) {
       dispatch(
         postOrder(idIngredients)
       )
@@ -31,7 +32,6 @@ function PurchaseAmount({ ingredients, buns }) {
       type: ORDER_ITEMS_RESET
     })
   }
-
   const totalPrice = useMemo(() => {
     let ingredientPrice = ingredients.reduce((sum, item) => { return item.price + sum }, 0)
     return ingredientPrice + (buns.price * 2)
@@ -43,7 +43,11 @@ function PurchaseAmount({ ingredients, buns }) {
         {totalPrice}
         <CurrencyIcon />
       </span>
-      <Button htmlType="button" type="primary" size="large" onClick={sendOrder}>{request || orderDetails ? <p className={`text text_type_main-small ${style.purchaseAmount__loading}`}>Оформляем заказ...</p> : `Оформить заказ`}</Button>
+      <Button htmlType="button" type="primary" size="large" onClick={sendOrder}>
+        {request || orderDetails
+          ? <p className={`text text_type_main-small ${style.purchaseAmount__loading}`}>Оформляем заказ...</p>
+          : `Оформить заказ`}
+      </Button>
       {
         orderDetails && (
           <Modal onClose={handleClose}>

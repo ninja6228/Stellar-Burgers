@@ -1,0 +1,41 @@
+.section {
+  width: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 0;
+}
+
+.link {
+  text-decoration: none;
+  color: #F2F2F3;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 0;
+}
+
+.loader {
+  display: inline-block;
+  font-size: 20px;
+  clip-path: inset(0 3ch 0 0);
+  animation: step 1s steps(4) infinite;
+  position: absolute;
+  top: 32%;
+  right: 43%;
+  text-shadow: 0 0 16px rgb(51 51 255 / 25%), 0 0 8px rgb(51 51 255 / 25%), 0 4px 32px rgb(51 51 255 / 50%);
+
+}
+
+@keyframes step {
+  to {
+    clip-path: inset(0 -1ch 0 0)
+  }
+}
+
+.clearList {
+  margin-top: 167px;
+  margin-left: 97px;
+}
