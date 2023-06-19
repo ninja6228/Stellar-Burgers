@@ -23,14 +23,11 @@ import {
   USER_UPDATE_TOKEN_SUCCESS,
   USER_UPDATE_TOKEN_FAILED,
 
+  USER_SET_IS_AUTH
 } from '../actions/user';
 
 const initialState = {
-  form: {
-    name: '',
-    email: '',
-    password: '',
-  },
+  form: null,
   error: '',
   isAuth: false,
   registerRequest: false,
@@ -51,6 +48,12 @@ const initialState = {
 export const usersReducer = (state = initialState, action) => {
 
   switch (action.type) {
+    case USER_SET_IS_AUTH: {
+      return {
+        ...state,
+        isAuth: action.payload
+      }
+    }
     case USER_REGISTER_REQUEST: {
       return {
         ...state,
@@ -109,8 +112,8 @@ export const usersReducer = (state = initialState, action) => {
     case USER_LOGOUT_SUCCESS: {
       return {
         ...state,
-        logoutRequest: false,
-        isAuth: false,
+        logoutRequest: false,        
+        form: null
       };
     }
     case USER_LOGOUT_FAILED: {

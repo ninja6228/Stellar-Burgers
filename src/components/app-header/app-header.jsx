@@ -22,11 +22,11 @@ function AppHeader() {
               </NavLink>
             </li>
             <li>
-              <NavLink to="/orders"
-                className={location.pathname === '/orders'
+              <NavLink to="/feed"
+                className={location.pathname === '/feed'
                   ? `${style.header__link__active} text text_type_main-default p-5`
                   : `${style.header__link__inactive} text text_type_main-default p-5`}>
-                <ListIcon type={location.pathname === '/orders' ? 'primary' : 'secondary'} />
+                <ListIcon type={location.pathname === '/feed' ? 'primary' : 'secondary'} />
                 Лента заказов
               </NavLink>
             </li>
@@ -37,10 +37,10 @@ function AppHeader() {
         </Link>
         <div className={style.header__profile}>
           <NavLink to="/profile"
-            className={location.pathname === '/profile'
+            className={location.pathname === '/profile' || location.pathname === '/profile/orders'
               ? `${style.header__link__active} text text_type_main-default p-5`
               : `${style.header__link__inactive} text text_type_main-default p-5`}>
-            <ProfileIcon type={location.pathname === '/profile' ? 'primary' : 'secondary'} />
+            <ProfileIcon type={location.pathname === '/profile' || location.pathname === '/profile/orders' ? 'primary' : 'secondary'} />
             Личный кабинет
           </NavLink>
         </div>

@@ -25,6 +25,29 @@ export const USER_UPDATE_TOKEN_REQUEST = 'USER_UPDATE_TOKEN_REQUEST';
 export const USER_UPDATE_TOKEN_SUCCESS = 'USER_UPDATE_TOKEN_SUCCESS';
 export const USER_UPDATE_TOKEN_FAILED = 'USER_UPDATE_TOKEN_FAILED';
 
+export const USER_SET_IS_AUTH = 'USER_SET_IS_AUTH';
+
+const setIsAuth = (value) => ({
+  type: USER_SET_IS_AUTH,
+  payload: value
+});
+
+export const checkUserAuth = () => {
+  return (dispatch) => {
+    if (getCookie("accessToken")) {
+      dispatch(getUser())
+        .catch((error) => {
+          deleteCookie('accessToken');
+          deleteCookie('refreshToken');
+          console.log(`Ошибка: ${error}`)
+        })
+        .finally(() => dispatch(setIsAuth(true)));
+    } else {
+      dispatch(setIsAuth(true));
+    }
+  };
+};
+
 export const register = (form) => {
   return function (dispatch) {
     dispatch({ type: USER_REGISTER_REQUEST })
@@ -41,8 +64,8 @@ export const register = (form) => {
             type: USER_REGISTER_SUCCESS,
             form: res.user
           });
-          setCookie('token', res.accessToken);
-          localStorage.setItem('token', res.refreshToken);
+          setCookie('accessToken', res.accessToken.split('Bearer ')[1]);
+          setCookie('refreshToken', res.refreshToken);
         }
       })
       .catch(error => {
@@ -68,8 +91,8 @@ export const login = (form) => {
             type: USER_LOGIN_SUCCESS,
             form: res.user
           });
-          setCookie('token', res.accessToken);
-          localStorage.setItem('token', res.refreshToken);
+          setCookie('accessToken', res.accessToken.split('Bearer ')[1]);
+          setCookie('refreshToken', res.refreshToken);
         }
       })
       .catch(error => {
@@ -88,7 +111,7 @@ export const logout = () => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        token: localStorage.getItem('token'),
+        "token": getCookie("refreshToken"),
       })
     })
       .then(res => {
@@ -96,8 +119,8 @@ export const logout = () => {
           dispatch({
             type: USER_LOGOUT_SUCCESS
           });
-          deleteCookie('token');
-          localStorage.removeItem('token');
+          deleteCookie('accessToken');
+          deleteCookie('refreshToken');
         }
       })
       .catch(error => {
@@ -110,11 +133,11 @@ export const logout = () => {
 export const getUser = () => {
   return function (dispatch) {
     dispatch({ type: USER_GET_REQUEST })
-    request('auth/user', {
+    return request('auth/user', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: getCookie('token')
+        Authorization: 'Bearer ' + getCookie('accessToken')
       }
     })
       .then(res => {
@@ -144,7 +167,7 @@ export const updateUser = (form) => {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: getCookie('token')
+        Authorization: 'Bearer ' + getCookie('accessToken')
       },
       body: JSON.stringify(form)
     })
@@ -172,7 +195,7 @@ export const updateToken = () => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        token: localStorage.getItem('token'),
+        "token": getCookie("refreshToken")
       })
     })
       .then(res => {
@@ -180,8 +203,8 @@ export const updateToken = () => {
           dispatch({
             USER_UPDATE_TOKEN_SUCCESS
           });
-          setCookie('token', res.accessToken);
-          localStorage.setItem('token', res.refreshToken);
+          setCookie('accessToken', res.accessToken.split('Bearer ')[1]);
+          setCookie('refreshToken', res.refreshToken);
         }
       })
       .catch(error => {

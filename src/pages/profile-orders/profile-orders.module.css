@@ -1,0 +1,21 @@
+.container {
+  display: flex;
+  max-width: 1240px;
+}
+
+.history__wrapper {
+  margin-top: -85px;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding-right: 8px;
+  width: 850px;
+}
+
+.history__wrapper::-webkit-scrollbar {
+  width: 8px;
+  background-color: #2f2f37;
+}
+
+.history__wrapper::-webkit-scrollbar-thumb {
+  background-color: #8585AD;
+}
