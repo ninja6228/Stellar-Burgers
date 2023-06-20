@@ -4,7 +4,7 @@ import App from './components/app/app';
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import store from './services/store'
-import { BrowserRouter as Router } from 'react-router-dom';
+import { HashRouter as Router } from 'react-router-dom';
 
 const container = document.getElementById("root");
 const root = createRoot(container);
