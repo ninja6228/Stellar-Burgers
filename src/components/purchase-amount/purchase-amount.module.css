@@ -4,8 +4,8 @@
   align-items: center;
 }
 
-.purchaseAmount__loading {
-  display:inline-block;
+.purchaseAmount__loading_button {
+  display: inline-block;
   font-size: 17px;
   clip-path: inset(0 3ch 0 0);
   animation: step 1s steps(4) infinite;
@@ -15,4 +15,11 @@
   to {
     clip-path: inset(0 -1ch 0 0)
   }
+}
+
+.purchaseAmount__loading {
+  padding-top: 35%;
+  font-size: 28px;
+  clip-path: inset(0 3ch 0 0);
+  animation: step 1s steps(4) infinite;
 }
