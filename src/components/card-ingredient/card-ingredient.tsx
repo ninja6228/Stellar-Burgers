@@ -25,12 +25,13 @@ const CardIngredient: FC<ICardIngredient> = ({ card, onOpen }) => {
       isDrag: monitor.isDragging()
     })
   });
-
+  
   const counters = useMemo(() => {
     let ingredientsCount = list.filter((item) => item._id === _id).length;
-    let counter = (type === BUN && bun && bun._id === _id ? 2 : type !== BUN && ingredientsCount ? ingredientsCount : '')
+    let counter = (type === BUN && bun && bun._id === _id ? 2 : type !== BUN && ingredientsCount ? ingredientsCount : null)
     return counter
   }, [_id, bun, list, type, BUN])
+
 
   return (
     <>
