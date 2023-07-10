@@ -1,5 +1,6 @@
 .wrapper {
   min-width: 720px;
+  min-height: 540px;
   background: #1c1c21;
   color: #f2f2f3;
   position: relative;
