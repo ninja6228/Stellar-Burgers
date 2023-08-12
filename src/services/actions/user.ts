@@ -247,7 +247,7 @@ export const logout: AppThunk = () => {
 export const getUser: AppThunk = () => {
   return function (dispatch: AppDispatch) {
     dispatch(userGetRequest())
-    return request('auth/user', {
+    request('auth/user', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -261,7 +261,8 @@ export const getUser: AppThunk = () => {
       })
       .catch(error => {
         dispatch(userGetFailed())
-        updateToken();
+        deleteCookie('accessToken');
+        deleteCookie('refreshToken');
         console.log(`Ошибка: ${error}`);
       })
   }
