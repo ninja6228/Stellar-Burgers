@@ -19,6 +19,6 @@
 [Click](https://ninja6228.github.io/Stellar-Burgers/)
 
 ## Запуск проекта
-* Клонировать проект - `git clone git@github.com:ninja6228/Stellar-Burgers.git`
+* Клонировать проект - `git clone https://github.com/ninja6228/Stellar-Burgers.git`
 * Устанавливаем зависимости - `npm install`
 * Запускаем проект - `npm start`
